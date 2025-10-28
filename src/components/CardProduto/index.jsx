@@ -1,10 +1,10 @@
-import { StyleSheet, Text, View, TouchableOpacity, TextInput } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput } from "react-native";
 import img from "../../../assets/icon.png"
 
-export default function CardProduto_Component({produto}){
+export default function CardProduto_Component({ produto }) {
     return (
         <View>
-            <Image style={styles.img} src={img}/>
+            <Image style={styles.img} source={img} />
             <View style={styles.infoProduto}>
                 <Text style={styles.nome}>{produto.nome}</Text>
                 <Text style={styles.preco}>{produto.preco}</Text>
@@ -17,7 +17,7 @@ export default function CardProduto_Component({produto}){
     )
 }
 
-const styles = StyleSheet.create({
-  container: {
-  },
+ const styles = StyleSheet.create({
+    container: {
+    },
 });

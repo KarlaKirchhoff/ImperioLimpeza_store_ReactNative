@@ -5,3 +5,5 @@ export default function CadastrarProduto_Component(){
         <></>
     )
 }
+
+// receber foto de arquivo e camera
