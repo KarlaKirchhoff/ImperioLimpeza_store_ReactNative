@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput } from "react-native";
+/* import { StyleSheet, Text, View, TouchableOpacity, Image, TextInput } from "react-native";
 import img from "../../../assets/icon.png"
 
 export default function CardProduto_Component({ produto }) {
@@ -20,4 +20,4 @@ export default function CardProduto_Component({ produto }) {
  const styles = StyleSheet.create({
     container: {
     },
-});
+}); */
