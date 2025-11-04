@@ -143,7 +143,7 @@ const priceDigitsToNumber = (digits: string) => {
 };
 
 /* ------------------- Componente ------------------- */
-export default function ProductFormScreen() {
+export default function CadastrarProduto_Screen() {
     // form states
     const [imagemUri, setImagemUri] = useState<string | undefined>(undefined);
     const [imagemError, setImagemError] = useState<string | null>(null);
@@ -270,7 +270,7 @@ export default function ProductFormScreen() {
                 ? await ImagePicker.launchCameraAsync({ allowsEditing: false, quality: 1 })
                 : await ImagePicker.launchImageLibraryAsync({ allowsEditing: false, quality: 1 });
 
-            if (res.cancelled) return;
+            if (res.canceled) return;
 
             const uri = (res as any).uri as string;
             const ext = getFileExtension(uri);
@@ -288,8 +288,14 @@ export default function ProductFormScreen() {
             const size = info.size ?? 0;
             if (bytesToMb(size) > IMAGE_MAX_MB) {
                 // tentamos redimensionar; se ainda maior, erro
-                
-                const { uri: resizedUri, size: newSize } = await resizeAndSaveImage(uri);
+
+                const result_ResizeAndSaveImage = await resizeAndSaveImage(uri);
+                if (!result_ResizeAndSaveImage) {
+                    setImagemError('Erro ao redimensionar imagem');
+                    return;
+                }
+                const { uri: resizedUri, size: newSize } = result_ResizeAndSaveImage;
+
                 if (bytesToMb(newSize) > IMAGE_MAX_MB) {
                     setImagemError(`Imagem muito grande (> ${IMAGE_MAX_MB}MB) mesmo após redimensionar`);
                     return;
@@ -299,7 +305,13 @@ export default function ProductFormScreen() {
                 }
             } else {
                 // já está abaixo do limite -> ainda assim criamos uma versão otimizada para padronizar
-                const { uri: resizedUri } = await resizeAndSaveImage(uri);
+                const result = await resizeAndSaveImage(uri);
+
+                if (!result || !result.uri) {
+                    setImagemError('Erro ao redimensionar imagem');
+                    return;
+                }
+                const { uri: resizedUri } = result;
                 setImagemUri(resizedUri);
             }
         } catch (err) {

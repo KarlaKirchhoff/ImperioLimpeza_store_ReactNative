@@ -5,11 +5,12 @@ import { SafeAreaView, StyleSheet } from 'react-native';
 import Header from './src/components/Header';
 import Home from './src/page/Home';
 import AuthScreens from './src/page/Autenticacao/index';
+import CadastrarProduto_Screen from './src/page/CadastrarProduto';
 
 const App: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <AuthScreens />
+      <CadastrarProduto_Screen />
       <StatusBar style="auto" />
     </SafeAreaView>
   );
