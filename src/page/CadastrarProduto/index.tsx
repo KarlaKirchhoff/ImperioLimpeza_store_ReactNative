@@ -21,6 +21,7 @@ const IMAGE_MAX_MB = 5; // limite em MB (ajuste conforme desejar)
 const ALLOWED_IMAGE_EXT = ["png", "jpg", "jpeg"];
 const MAX_IMG_WIDTH = 1024; // largura alvo para redimensionamento
 const IMAGE_QUALITY = 0.85; // 0..1
+ export const PRODUCT_DIRECTORY = `${FileSystem.documentDirectory}produtos/`;
 
 /* ------------------- Tipos ------------------- */
 export type Categoria = { id: string; nome: string } // placeholder
@@ -62,7 +63,7 @@ const saveProductToStorage = async (p: Product) => {
         const raw = await AsyncStorage.getItem(PRODUCTS_STORAGE_KEY);
         const arr: Product[] = raw ? JSON.parse(raw) : [];
         arr.unshift(p); // adiciona no começo
-        await AsyncStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(arr));
+        await AsyncStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(arr));      
         return true;
     } catch (err) {
         console.error("saveProductToStorage", err);
@@ -90,7 +91,7 @@ const resizeAndSaveImage = async (uri: string) => {
     );
     // salvamos um novo arquivo em diretório persistente (documentDirectory)/produtos/
     // garantimos que o diretório exista
-    const produtosDir = `${FileSystem.documentDirectory}produtos/`;
+    const produtosDir = PRODUCT_DIRECTORY;
     try {
         await FileSystem.makeDirectoryAsync(produtosDir, { intermediates: true });
     } catch (e) {
@@ -389,6 +390,9 @@ export default function CadastrarProduto_Screen() {
                 setSubmitting(false);
                 return;
             }
+
+            console.log(product);
+            
 
             Alert.alert("Sucesso", "Produto cadastrado!");
             // limpa formulário
