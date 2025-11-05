@@ -88,17 +88,28 @@ const resizeAndSaveImage = async (uri: string) => {
         [{ resize: { width: MAX_IMG_WIDTH } }],
         { compress: IMAGE_QUALITY, format: ImageManipulator.SaveFormat.JPEG }
     );
+    // salvamos um novo arquivo em diretório persistente (documentDirectory)/produtos/
+    // garantimos que o diretório exista
+    const produtosDir = `${FileSystem.documentDirectory}produtos/`;
+    try {
+        await FileSystem.makeDirectoryAsync(produtosDir, { intermediates: true });
+    } catch (e) {
+        // se já existir pode lançar, outros erros seguem adiante
+        // console.warn('makeDirectoryAsync:', e);
+    }
 
-    // salvamos um novo arquivo dentro do cache:
-    const dest = `${FileSystem.cacheDirectory}prod_${Date.now()}.jpg`;
+    const dest = `${produtosDir}prod_${Date.now()}.jpg`;
     await FileSystem.copyAsync({ from: manipResult.uri, to: dest });
     const finalInfo = await FileSystem.getInfoAsync(dest, { size: true });
     if (!finalInfo.exists) {
         console.log("Arquivo não encontrado");
         return;
     }
+
+    console.log(`resizeAndSaveImage: arquivo salvo em ${dest} (size=${finalInfo.size ?? 0})`);
     return { uri: dest, size: finalInfo.size ?? 0 };
 };
+
 
 /* ---------- Termos processing ---------- */
 const processTermsInput = (raw: string) => {
@@ -270,9 +281,22 @@ export default function CadastrarProduto_Screen() {
                 ? await ImagePicker.launchCameraAsync({ allowsEditing: false, quality: 1 })
                 : await ImagePicker.launchImageLibraryAsync({ allowsEditing: false, quality: 1 });
 
-            if (res.canceled) return;
+            // new Expo returns { cancelled: boolean, assets: [{ uri, ... }] } or older versions may return { uri }
+            // normalize to a single `uri` variable and guard if missing
+            if ((res as any).cancelled === true || (res as any).canceled === true) return;
 
-            const uri = (res as any).uri as string;
+            let uri: string | undefined;
+            if ((res as any).assets && Array.isArray((res as any).assets) && (res as any).assets.length > 0) {
+                uri = (res as any).assets[0].uri;
+            } else if ((res as any).uri) {
+                uri = (res as any).uri;
+            }
+
+            if (!uri) {
+                console.warn('pickImage: imagem sem uri no resultado', res);
+                setImagemError('Não foi possível obter a imagem selecionada');
+                return;
+            }
             const ext = getFileExtension(uri);
             if (!ALLOWED_IMAGE_EXT.includes(ext)) {
                 setImagemError("Formato inválido (apenas png, jpg, jpeg)");
@@ -300,6 +324,7 @@ export default function CadastrarProduto_Screen() {
                     setImagemError(`Imagem muito grande (> ${IMAGE_MAX_MB}MB) mesmo após redimensionar`);
                     return;
                 } else {
+                    console.log('pickImage: imagem salva em (resized)', resizedUri);
                     setImagemUri(resizedUri);
                     return;
                 }
@@ -312,6 +337,7 @@ export default function CadastrarProduto_Screen() {
                     return;
                 }
                 const { uri: resizedUri } = result;
+                console.log('pickImage: imagem salva em', resizedUri);
                 setImagemUri(resizedUri);
             }
         } catch (err) {
