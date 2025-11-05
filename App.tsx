@@ -3,9 +3,9 @@ import React from 'react';
 import { SafeAreaView, StyleSheet } from 'react-native';
 
 import Header from './src/components/Header';
-import Home from './src/page/Home';
-import AuthScreens from './src/page/Autenticacao/index';
-import CadastrarProduto_Screen from './src/page/CadastrarProduto';
+import Home from './src/Screens/Home';
+import AuthScreens from './src/Screens/Autenticacao/Autenticacao';
+import CadastrarProduto_Screen from './src/Screens/CadastrarProduto/CadastrarProduto_Screen';
 
 const App: React.FC = () => {
   return (
