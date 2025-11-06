@@ -7,11 +7,12 @@ import Home from './src/Screens/Home';
 import AuthScreens from './src/Screens/Autenticacao/Autenticacao';
 import CadastrarProduto_Screen from './src/Screens/CadastrarProduto/CadastrarProduto_Screen';
 import HomeScreen from './src/Screens/Home';
+import SobreNos_Screen from './src/Screens/SobreNos/SobreNos_Screen';
 
 const App: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <HomeScreen />
+      <SobreNos_Screen />
       <StatusBar style="auto" />
     </SafeAreaView>
   );
