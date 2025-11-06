@@ -10,6 +10,9 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+import { PRODUCT_DIRECTORY } from "../CadastrarProduto/CadastrarProduto_Screen";
+import { PRODUCTS_STORAGE_KEY } from "../CadastrarProduto/CadastrarProduto_Screen";
+
 interface Produto {
   id: string;
   nome: string;
@@ -17,29 +20,7 @@ interface Produto {
   imagem: string;
 }
 
-const produtosIniciais: Produto[] = [
-  {
-    id: "1",
-    nome: "Detergente Neutro 500ml",
-    preco: 3.5,
-    imagem:
-      "https://cdn.awsli.com.br/600x450/1079/1079397/produto/47156309/301d0c3b8b.jpg",
-  },
-  {
-    id: "2",
-    nome: "Desinfetante Lavanda 2L",
-    preco: 8.9,
-    imagem:
-      "https://cdn.awsli.com.br/600x450/1079/1079397/produto/47156312/6c66e23a8a.jpg",
-  },
-  {
-    id: "3",
-    nome: "Sabão em Pó 1kg",
-    preco: 12.99,
-    imagem:
-      "https://cdn.awsli.com.br/600x450/1079/1079397/produto/47156322/fd14f293b7.jpg",
-  },
-];
+const produtosIniciais =
 
 export default function HomeScreen() {
   const [produtos, setProdutos] = useState<Produto[]>(produtosIniciais);

@@ -16,7 +16,7 @@ import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 /* ------------------- Configs ------------------- */
-const PRODUCTS_STORAGE_KEY = "products_v1";
+export const PRODUCTS_STORAGE_KEY = "products_v1";
 const IMAGE_MAX_MB = 5; // limite em MB (ajuste conforme desejar)
 const ALLOWED_IMAGE_EXT = ["png", "jpg", "jpeg"];
 const MAX_IMG_WIDTH = 1024; // largura alvo para redimensionamento
