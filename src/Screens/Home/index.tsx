@@ -1,5 +1,5 @@
 // src/pages/Home.tsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,19 +12,29 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { PRODUCT_DIRECTORY } from "../CadastrarProduto/CadastrarProduto_Screen";
 import { PRODUCTS_STORAGE_KEY } from "../CadastrarProduto/CadastrarProduto_Screen";
-
-interface Produto {
-  id: string;
-  nome: string;
-  preco: number;
-  imagem: string;
-}
-
-const produtosIniciais =
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import type { Product as Produto } from "../CadastrarProduto/CadastrarProduto_Screen";
 
 export default function HomeScreen() {
-  const [produtos, setProdutos] = useState<Produto[]>(produtosIniciais);
+  const [produtos, setProdutos] = useState<Produto[]>([]);
   const [favoritos, setFavoritos] = useState<string[]>([]);
+
+  // 🔹 Buscar os produtos salvos no AsyncStorage
+  useEffect(() => {
+    const carregarProdutos = async () => {
+      try {
+        const produtosStorage = await AsyncStorage.getItem(PRODUCTS_STORAGE_KEY);
+        const produtosIniciais: Produto[] = produtosStorage
+          ? JSON.parse(produtosStorage)
+          : [];
+        setProdutos(produtosIniciais);
+      } catch (err) {
+        console.error("Erro ao carregar produtos do AsyncStorage:", err);
+      }
+    };
+
+    carregarProdutos();
+  }, []);
 
   const handleAddCarrinho = (id: string) => {
     console.log(`Produto ${id} adicionado ao carrinho`);
@@ -41,7 +51,7 @@ export default function HomeScreen() {
   };
 
   const renderItem = ({ item }: { item: Produto }) => {
-    const isFavorito = favoritos.includes(item.id);
+    const isFavorito = favoritos.includes(item.cod);
 
     return (
       <View style={styles.card}>
@@ -52,14 +62,14 @@ export default function HomeScreen() {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, styles.viewButton]}
-            onPress={() => handleVerProduto(item.id)}
+            onPress={() => handleVerProduto(item.cod)}
           >
             <Ionicons name="eye" size={20} color="#fff" />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.button, styles.cartButton]}
-            onPress={() => handleAddCarrinho(item.id)}
+            onPress={() => handleAddCarrinho(item.cod)}
           >
             <Ionicons name="cart" size={20} color="#fff" />
           </TouchableOpacity>
@@ -69,7 +79,7 @@ export default function HomeScreen() {
               styles.button,
               { backgroundColor: isFavorito ? "#e63946" : "#457b9d" },
             ]}
-            onPress={() => handleFavoritar(item.id)}
+            onPress={() => handleFavoritar(item.cod)}
           >
             <Ionicons
               name={isFavorito ? "heart" : "heart-outline"}
@@ -88,7 +98,7 @@ export default function HomeScreen() {
 
       <FlatList
         data={produtos}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.cod}
         renderItem={renderItem}
         numColumns={2}
         contentContainerStyle={styles.list}
