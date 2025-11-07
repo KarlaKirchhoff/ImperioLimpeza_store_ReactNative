@@ -41,14 +41,14 @@ export interface CartItemType {
   quantity: number;
 }
 
-const CART_STORAGE_KEY = "cart_v1";
+export const CART_STORAGE_KEY = "cart_v1";
 
 /**
  * Props:
  * - userId / userName são opcionais, mas usados ao gerar pedido.
  */
-export default function CartScreen({ userId, userName }: { userId?: string; userName?: string }) {
-  const [items, setItems] = useState<CartItemType[]>([]);
+export default function CarrrinhoCompras_Screen({ userId, userName }: { userId?: string; userName?: string }) {
+  const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewProduct, setPreviewProduct] = useState<Product | null>(null);
   const [sharing, setSharing] = useState(false);
@@ -63,6 +63,7 @@ export default function CartScreen({ userId, userName }: { userId?: string; user
       } finally {
         setLoading(false);
       }
+
     })();
   }, []);
 

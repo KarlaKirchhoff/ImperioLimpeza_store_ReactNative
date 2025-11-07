@@ -14,6 +14,9 @@ import { PRODUCT_DIRECTORY } from "../CadastrarProduto/CadastrarProduto_Screen";
 import { PRODUCTS_STORAGE_KEY } from "../CadastrarProduto/CadastrarProduto_Screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Product as Produto } from "../CadastrarProduto/CadastrarProduto_Screen";
+import { CART_STORAGE_KEY } from "../CarrinhoCompras/CarrinhoCompras";
+
+import type { CartItemType } from "../CarrinhoCompras/CarrinhoCompras";
 
 export default function HomeScreen() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
@@ -36,9 +39,37 @@ export default function HomeScreen() {
     carregarProdutos();
   }, []);
 
-  const handleAddCarrinho = (id: string) => {
-    console.log(`Produto ${id} adicionado ao carrinho`);
+  const handleAddCarrinho = async (produto: Produto) => {
+    console.log('produto');
+    console.log(produto);
+
+    try {
+      const carrinhoAtual = await AsyncStorage.getItem(CART_STORAGE_KEY);
+      console.log('carrinhoAtual');
+      console.log(carrinhoAtual);
+
+      const itensRaw = carrinhoAtual ? JSON.parse(carrinhoAtual) : [];
+      const itens: CartItemType[] = itensRaw.map((i: any) =>
+        i.product ? i : { product: i, quantity: 1 }
+      );
+
+      // verifica se o produto já existe
+      const jaExiste = itens.find((p) => p.product.cod === produto.cod);
+
+      if (!jaExiste) {
+        itens.push({ product: produto, quantity: 1 });
+        await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(itens));
+        console.log(itens);
+
+        console.log("Produto adicionado ao carrinho:", produto.nome);
+      } else {
+        console.log("Produto já está no carrinho:", produto.nome);
+      }
+    } catch (err) {
+      console.error("Erro ao adicionar ao carrinho", err);
+    }
   };
+
 
   const handleFavoritar = (id: string) => {
     setFavoritos((prev) =>
@@ -69,7 +100,7 @@ export default function HomeScreen() {
 
           <TouchableOpacity
             style={[styles.button, styles.cartButton]}
-            onPress={() => handleAddCarrinho(item.cod)}
+            onPress={() => handleAddCarrinho(item)}
           >
             <Ionicons name="cart" size={20} color="#fff" />
           </TouchableOpacity>
