@@ -15,18 +15,21 @@ import * as ImageManipulator from "expo-image-manipulator";
 import * as FileSystem from "expo-file-system";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import gerarId from "../../utils/gerarId";
+import FormatarPrecoParaNumero from "../../utils/Formatacao/FormatarPrecoParaNumero";
+
 /* ------------------- Configs ------------------- */
 export const PRODUCTS_STORAGE_KEY = "products_v1";
 const IMAGE_MAX_MB = 5; // limite em MB (ajuste conforme desejar)
 const ALLOWED_IMAGE_EXT = ["png", "jpg", "jpeg"];
 const MAX_IMG_WIDTH = 1024; // largura alvo para redimensionamento
 const IMAGE_QUALITY = 0.85; // 0..1
- export const PRODUCT_DIRECTORY = `${FileSystem.documentDirectory}produtos/`;
+export const PRODUCT_DIRECTORY = `${FileSystem.documentDirectory}produtos/`;
 
 /* ------------------- Tipos ------------------- */
 export type Categoria = { id: string; nome: string } // placeholder
 
-export interface Product {
+export interface Produto {
     cod: string;
     nome: string;
     marca: string;
@@ -37,14 +40,6 @@ export interface Product {
     categorias: Categoria[];
     imagem?: string; // uri local do arquivo redimensionado
 }
-
-/* ---------- util: uuid simples ---------- */
-const genId = () =>
-    "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-        const r = (Math.random() * 16) | 0;
-        const v = c === "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-    });
 
 /* ---------- util Unicode-aware length ---------- */
 const unicodeLen = (s: string) => Array.from(s).length;
@@ -58,12 +53,12 @@ const termRegex = /^[\p{L}_]+$/u;
 const marcaRegex = /^[\p{L}\s'-]+$/u;
 
 /* ---------- storage helpers ---------- */
-const saveProductToStorage = async (p: Product) => {
+const saveProductToStorage = async (p: Produto) => {
     try {
         const raw = await AsyncStorage.getItem(PRODUCTS_STORAGE_KEY);
-        const arr: Product[] = raw ? JSON.parse(raw) : [];
+        const arr: Produto[] = raw ? JSON.parse(raw) : [];
         arr.unshift(p); // adiciona no começo
-        await AsyncStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(arr));      
+        await AsyncStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(arr));
         return true;
     } catch (err) {
         console.error("saveProductToStorage", err);
@@ -126,32 +121,6 @@ const processTermsInput = (raw: string) => {
     // remover duplicatas
     const uniq = Array.from(new Set(parts));
     return uniq;
-};
-
-/* ---------- Preço input helper ---------- */
-/**
- * O usuário digita apenas dígitos (0-9). A função retorna string formatada com vírgula antes dos 2 últimos dígitos:
- * Ex: inputDigits = "1" -> "0,01"; "12" -> "0,12"; "123" -> "1,23"; "12345" -> "123,45"
- * Internamente armazenamos como string de dígitos; na submissão convertemos para number: replace(',', '.') e parseFloat
- */
-const formatPriceFromDigits = (digits: string) => {
-    const clean = digits.replace(/\D/g, "");
-    const padded = clean.padStart(3, "0"); // garantir pelo menos 3 pra simplificar: '001' -> 0,01
-    const len = padded.length;
-    const intPart = padded.slice(0, len - 2).replace(/^0+/, "") || "0";
-    const cents = padded.slice(len - 2);
-    // Exibir com separador de milhares fácil? Por simplicidade não adicionamos '.' milhares.
-    return `${intPart},${cents}`;
-};
-
-const priceDigitsToNumber = (digits: string) => {
-    const clean = digits.replace(/\D/g, "");
-    if (!clean) return 0;
-    const len = clean.length;
-    const intPart = clean.slice(0, len - 2) || "0";
-    const cents = clean.slice(len - 2).padStart(2, "0");
-    const join = `${intPart}.${cents}`;
-    return Number(join);
 };
 
 /* ------------------- Componente ------------------- */
@@ -368,12 +337,12 @@ export default function CadastrarProduto_Screen() {
         setSubmitting(true);
         try {
             // montar objeto
-            const precoNum = priceDigitsToNumber(priceDigits); // número com ponto
+            const precoNum = DigitosPrecoParaNumero(priceDigits); // número com ponto
             const termosHashTags =
                 termosProcessed.length > 0 ? termosProcessed.map((t) => `#${t}`).join("") : "";
 
-            const product: Product = {
-                cod: genId(),
+            const product: Produto = {
+                cod: gerarId(),
                 nome: nome.trim(),
                 marca: marca.trim(),
                 preco: precoNum,
@@ -392,7 +361,7 @@ export default function CadastrarProduto_Screen() {
             }
 
             console.log(product);
-            
+
 
             Alert.alert("Sucesso", "Produto cadastrado!");
             // limpa formulário
@@ -502,7 +471,7 @@ export default function CadastrarProduto_Screen() {
                 <Text style={s.label}>Preço</Text>
                 <TextInput
                     style={[s.input, priceError ? s.inputError : null]}
-                    value={formatPriceFromDigits(priceDigits)}
+                    value={FormatarPrecoParaNumero(priceDigits)}
                     keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
                     onChangeText={(t) => {
                         // aceitar apenas dígitos
