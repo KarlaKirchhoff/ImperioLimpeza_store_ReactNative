@@ -7,3 +7,5 @@ const DigitosPrecoParaNumero = (digits: string) => {
     const join = `${intPart}.${cents}`;
     return Number(join);
 };
+
+export default DigitosPrecoParaNumero;

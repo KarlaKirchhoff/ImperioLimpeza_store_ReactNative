@@ -13,13 +13,13 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import * as ImageManipulator from "expo-image-manipulator";
 import * as FileSystem from "expo-file-system";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import gerarId from "../../utils/gerarId";
 import FormatarPrecoParaNumero from "../../utils/Formatacao/FormatarPrecoParaNumero";
-
+import DigitosPrecoParaNumero from "../../utils/Conversao/DigitosPrecoParaNumero";
+import ProdutoStorage from "../../storage/ProdutoStorage"; const storage = new ProdutoStorage();
 /* ------------------- Configs ------------------- */
-export const PRODUCTS_STORAGE_KEY = "products_v1";
+
 const IMAGE_MAX_MB = 5; // limite em MB (ajuste conforme desejar)
 const ALLOWED_IMAGE_EXT = ["png", "jpg", "jpeg"];
 const MAX_IMG_WIDTH = 1024; // largura alvo para redimensionamento
@@ -53,18 +53,6 @@ const termRegex = /^[\p{L}_]+$/u;
 const marcaRegex = /^[\p{L}\s'-]+$/u;
 
 /* ---------- storage helpers ---------- */
-const saveProductToStorage = async (p: Produto) => {
-    try {
-        const raw = await AsyncStorage.getItem(PRODUCTS_STORAGE_KEY);
-        const arr: Produto[] = raw ? JSON.parse(raw) : [];
-        arr.unshift(p); // adiciona no começo
-        await AsyncStorage.setItem(PRODUCTS_STORAGE_KEY, JSON.stringify(arr));
-        return true;
-    } catch (err) {
-        console.error("saveProductToStorage", err);
-        return false;
-    }
-};
 
 /* ---------- Image helpers ---------- */
 const getFileExtension = (uri: string) => {
@@ -353,7 +341,7 @@ export default function CadastrarProduto_Screen() {
                 imagem: imagemUri,
             };
 
-            const ok = await saveProductToStorage(product);
+            const ok = await storage.salvar(product);
             if (!ok) {
                 Alert.alert("Erro", "Não foi possível salvar o produto localmente.");
                 setSubmitting(false);

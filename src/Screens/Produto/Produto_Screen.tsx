@@ -8,42 +8,22 @@ import {
   Alert,
 } from "react-native";
 
-// Tipagem do produto
-interface Produto {
-  id: string;
-  imagem: string;
-  nome: string;
-  marca: string;
-  descricao?: string;
-  preco: number;
-  termos_pesquisa: string[];
-  categorias: string[];
-  estoque: number;
-}
+import { Produto } from "../CadastrarProduto/CadastrarProduto_Screen";
+
 
 // Página principal
-export default function Produto_Screen() {
-  const produto: Produto = {
-    id: "1",
-    imagem:
-      "https://cdn-icons-png.flaticon.com/512/1046/1046857.png",
-    nome: "Desinfetante Floral",
-    marca: "CleanHouse",
-    descricao:
-      "Desinfetante de uso geral com fragrância floral. Ideal para limpeza de pisos e superfícies.",
-    preco: 12.5,
-    termos_pesquisa: ["#limpeza", "#floral", "#desinfetante"],
-    categorias: ["higiene", "lar"],
-    estoque: 10,
-  };
+export default function Produto_Screen(produto: Produto) {
+
+  let estoque = 20
 
   const [quantidade, setQuantidade] = useState(1);
   const [favorito, setFavorito] = useState(false);
 
   const precoTotal = (produto.preco * quantidade).toFixed(2);
 
+  // importar a quantidade do estoque via API
   const aumentarQtd = () => {
-    if (quantidade < produto.estoque) setQuantidade(quantidade + 1);
+    if (quantidade < estoque) setQuantidade(quantidade + 1);
     else Alert.alert("Aviso", "Quantidade máxima em estoque atingida!");
   };
 
@@ -84,7 +64,7 @@ export default function Produto_Screen() {
         <TouchableOpacity
           style={styles.btnQtd}
           onPress={aumentarQtd}
-          disabled={quantidade === produto.estoque}
+          disabled={quantidade === estoque}
         >
           <Text style={styles.textBtn}>+</Text>
         </TouchableOpacity>
@@ -236,7 +216,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   btnFavorito: {
-    backgroundColor: "#E0E0E0",
+    backgroundColor: "#8f9b8fff",
     padding: 12,
     borderRadius: 10,
     width: "100%",

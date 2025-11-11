@@ -12,10 +12,9 @@ import {
   ActivityIndicator,
   Platform,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as FileSystem from "expo-file-system";
-import * as Sharing from "expo-sharing";
-import * as Linking from "expo-linking";
+
+import CarrinhoStorage from "../../storage/CarrinhoStorage"; const storage = new CarrinhoStorage();
+import ComprovantePedidoHTML from "./ComprovantePedidoHTML";
 
 /**
  * Tipos
@@ -37,11 +36,11 @@ export interface Product {
 
 /** Item do carrinho */
 export interface CartItemType {
+  id: number
   product: Product;
   quantity: number;
 }
 
-export const CART_STORAGE_KEY = "cart_v1";
 
 /**
  * Props:
@@ -56,10 +55,10 @@ export default function CarrrinhoCompras_Screen({ userId, userName }: { userId?:
   useEffect(() => {
     (async () => {
       try {
-        const raw = await AsyncStorage.getItem(CART_STORAGE_KEY);
-        setItems(raw ? JSON.parse(raw) : []);
+        const itens = await storage.listar();
+        setItems(itens);
       } catch (err) {
-        console.error("load cart", err);
+        console.error("Erro ao carregar o carrinho", err);
       } finally {
         setLoading(false);
       }
@@ -68,10 +67,10 @@ export default function CarrrinhoCompras_Screen({ userId, userName }: { userId?:
   }, []);
 
   /* ---------- Helpers storage ---------- */
-  const persist = async (next: CartItemType[]) => {
+  const atualizarStorage = async (next: CartItemType[]) => {
     setItems(next);
     try {
-      await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(next));
+      await storage.atualzarLista(next);
     } catch (err) {
       console.error("persist cart", err);
     }
@@ -89,79 +88,29 @@ export default function CarrrinhoCompras_Screen({ userId, userName }: { userId?:
       const next = items.map((i) =>
         i.product.cod === product.cod ? { ...i, quantity: newQty } : i
       );
-      persist(next);
+      atualizarStorage(next);
       return;
     }
     const q = Math.min(qty, max);
     const next = [{ product, quantity: q }, ...items];
-    persist(next);
+    atualizarStorage(next);
   };
 
   /* ---------- Update quantity (from item component) ---------- */
   const updateQuantity = (cod: string, quantity: number) => {
     const next = items.map((i) => (i.product.cod === cod ? { ...i, quantity } : i));
-    persist(next);
+    atualizarStorage(next);
   };
 
   /* ---------- Remove item ---------- */
   const removeItem = (cod: string) => {
     const next = items.filter((i) => i.product.cod !== cod);
-    persist(next);
+    atualizarStorage(next);
   };
 
   /* ---------- Totals ---------- */
   const totalItems = items.reduce((s, it) => s + it.quantity, 0);
   const totalPrice = items.reduce((s, it) => s + it.quantity * Number(it.product.preco ?? 0), 0);
-
-  /* ---------- Generate HTML of the order ---------- */
-  const generateOrderHtml = (orderId: string) => {
-    const date = new Date().toISOString();
-    const formattedItems = items
-      .map(
-        (it, idx) =>
-          `<tr>
-            <td style="padding:8px;border:1px solid #ddd;">${idx + 1}</td>
-            <td style="padding:8px;border:1px solid #ddd;">${it.product.nome} (${it.product.marca})</td>
-            <td style="padding:8px;border:1px solid #ddd;">R$ ${it.product.preco.toFixed(2)}</td>
-            <td style="padding:8px;border:1px solid #ddd;text-align:center;">${it.quantity}</td>
-            <td style="padding:8px;border:1px solid #ddd;">R$ ${(it.quantity * it.product.preco).toFixed(2)}</td>
-          </tr>`
-      )
-      .join("");
-
-    return `
-      <!doctype html>
-      <html>
-      <head>
-        <meta charset="utf-8"/>
-        <title>Pedido ${orderId}</title>
-      </head>
-      <body style="font-family: Arial, Helvetica, sans-serif; padding:20px;">
-        <h2>Pedido ${orderId}</h2>
-        <p><strong>Data:</strong> ${date}</p>
-        <p><strong>Cliente:</strong> ${userName ?? "—"} (ID: ${userId ?? "—"})</p>
-
-        <table style="border-collapse: collapse; width: 100%; margin-top: 16px;">
-          <thead>
-            <tr>
-              <th style="padding:8px;border:1px solid #ddd;">#</th>
-              <th style="padding:8px;border:1px solid #ddd;">Produto</th>
-              <th style="padding:8px;border:1px solid #ddd;">Valor unit.</th>
-              <th style="padding:8px;border:1px solid #ddd;">Qtd</th>
-              <th style="padding:8px;border:1px solid #ddd;">Subtotal</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${formattedItems}
-          </tbody>
-        </table>
-
-        <p style="margin-top:16px;"><strong>Quantidade total de itens:</strong> ${totalItems}</p>
-        <p><strong>Valor total da compra:</strong> R$ ${totalPrice.toFixed(2)}</p>
-      </body>
-      </html>
-    `;
-  };
 
   /* ---------- Finalize: create file and share (or open WhatsApp link) ---------- */
   const finalizeOrder = async () => {
@@ -172,47 +121,18 @@ export default function CarrrinhoCompras_Screen({ userId, userName }: { userId?:
 
     try {
       setSharing(true);
-      const orderId = `PED-${Date.now()}`;
-      const html = generateOrderHtml(orderId);
-      // write to file
-      const filename = `${FileSystem.cacheDirectory}${orderId}.html`;
-      await FileSystem.writeAsStringAsync(filename, html, { encoding: FileSystem.EncodingType.UTF8 });
+      const gerarPedido = new ComprovantePedidoHTML(
+        items, { id: userId ?? "", nome: userName ?? "" },
+        { items: totalItems, preco: totalPrice }
+      );
 
-      // share via expo-sharing (will open share sheet where user can pick WhatsApp)
-      if (await Sharing.isAvailableAsync()) {
-        await Sharing.shareAsync(filename, {
-          mimeType: "text/html",
-          dialogTitle: `Pedido ${orderId}`,
-        });
-        // opcional: abrir whatsapp com resumo (texto). Note: não é possível forçar anexo via URL scheme.
-        const summary = `Nome do Cliente: ${userName ?? "—"}, Valor Total: R$ ${totalPrice.toFixed(
-          2
-        )}\nPedido: ${orderId}`;
-        const encoded = encodeURIComponent(summary);
-        const whatsappUrl = `whatsapp://send?text=${encoded}`;
-        // tenta abrir whatsapp (se instalado)
-        const supported = await Linking.canOpenURL(whatsappUrl);
-        if (supported) {
-          // abrimos o whatsapp com o texto — o arquivo pode ser enviado separadamente pelo app se o usuário escolher compartilhar para ele
-          await Linking.openURL(whatsappUrl);
-        } else {
-          // fallback: abrir web.whatsapp
-          const webUrl = `https://api.whatsapp.com/send?text=${encoded}`;
-          await Linking.openURL(webUrl);
-        }
-      } else {
-        // caso sharing não disponível (rare), abrir whatsapp com texto e instruir a localizar o arquivo
-        const summary = `Nome do Cliente: ${userName ?? "—"}, Valor Total: R$ ${totalPrice.toFixed(
-          2
-        )}\nPedido: ${orderId}\n(Arquivo HTML salvo em: ${filename})`;
-        const encoded = encodeURIComponent(summary);
-        const webUrl = `https://api.whatsapp.com/send?text=${encoded}`;
-        await Linking.openURL(webUrl);
-        Alert.alert("Arquivo criado", `Arquivo salvo em: ${filename}`);
+      const orderFile = await gerarPedido.gerarPedido();
+      if (orderFile){
+        Alert.alert("Pedido Finalizado", "Arquivo disponível em: " + orderFile);
       }
-
+     
       // Após finalizar, opcionalmente limpar carrinho:
-      await AsyncStorage.removeItem(CART_STORAGE_KEY);
+      await storage.apagarTodos();
       setItems([]);
     } catch (err) {
       console.error("finalizeOrder err", err);

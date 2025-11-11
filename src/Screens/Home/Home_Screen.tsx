@@ -7,14 +7,13 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { PRODUCT_DIRECTORY } from "../CadastrarProduto/CadastrarProduto_Screen";
-import { PRODUCTS_STORAGE_KEY } from "../CadastrarProduto/CadastrarProduto_Screen";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { Product as Produto } from "../CadastrarProduto/CadastrarProduto_Screen";
-import { CART_STORAGE_KEY } from "../CarrinhoCompras/CarrinhoCompras";
+import ProdutoStorage from "../../storage/ProdutoStorage"; const storage = new ProdutoStorage();
+import { Produto } from "../CadastrarProduto/CadastrarProduto_Screen";
+import CarrinhoStorage from "../../storage/CarrinhoStorage"; const carrinhoStorage = new CarrinhoStorage();
 
 import type { CartItemType } from "../CarrinhoCompras/CarrinhoCompras";
 
@@ -26,11 +25,8 @@ export default function HomeScreen() {
   useEffect(() => {
     const carregarProdutos = async () => {
       try {
-        const produtosStorage = await AsyncStorage.getItem(PRODUCTS_STORAGE_KEY);
-        const produtosIniciais: Produto[] = produtosStorage
-          ? JSON.parse(produtosStorage)
-          : [];
-        setProdutos(produtosIniciais);
+        const produtosStorage = await storage.listar();
+        setProdutos(produtosStorage);
       } catch (err) {
         console.error("Erro ao carregar produtos do AsyncStorage:", err);
       }
@@ -44,12 +40,11 @@ export default function HomeScreen() {
     console.log(produto);
 
     try {
-      const carrinhoAtual = await AsyncStorage.getItem(CART_STORAGE_KEY);
+      const carrinhoAtual = await carrinhoStorage.listar();
       console.log('carrinhoAtual');
       console.log(carrinhoAtual);
 
-      const itensRaw = carrinhoAtual ? JSON.parse(carrinhoAtual) : [];
-      const itens: CartItemType[] = itensRaw.map((i: any) =>
+      const itens: CartItemType[] = carrinhoAtual.map((i: any) =>
         i.product ? i : { product: i, quantity: 1 }
       );
 
@@ -57,15 +52,14 @@ export default function HomeScreen() {
       const jaExiste = itens.find((p) => p.product.cod === produto.cod);
 
       if (!jaExiste) {
-        itens.push({ product: produto, quantity: 1 });
-        await AsyncStorage.setItem(CART_STORAGE_KEY, JSON.stringify(itens));
-        console.log(itens);
-
-        console.log("Produto adicionado ao carrinho:", produto.nome);
+        itens.push({ id: carrinhoAtual.length + 1 ,product: produto, quantity: 1 });
+        await carrinhoStorage.atualzarLista(itens);
+        Alert.alert("Produto adicionado ao carrinho:", produto.nome);
       } else {
-        console.log("Produto já está no carrinho:", produto.nome);
+        Alert.alert("Produto já está no carrinho:", produto.nome);
       }
     } catch (err) {
+      Alert.alert("Erro ao adicionar ao carrinho", "Tente novamente mais tarde.");
       console.error("Erro ao adicionar ao carrinho", err);
     }
   };
