@@ -12,10 +12,22 @@ import Produto_Screen from './src/Screens/Produto/Produto_Screen';
 import HistoricoPedidos_Screen from './src/Screens/HistoricoPedidos/HistoricoPedidos_Screen';
 import CarrrinhoCompras_Screen from './src/Screens/CarrinhoCompras/CarrinhoCompras';
 
+const produto = {
+  cod: 'string',
+  nome: 'string',
+  marca: 'string',
+  preco: 90,
+  termos_pesquisa: "#limpeza_azul#multiuso", // exemplo: "#limpeza_azul#multiuso"
+  descricao: 'string',
+  dt_criacao: '2020-01-12', // ISO string
+  categorias: [{id: '1', nome: "limpeza"}, {id: '2', nome: "casa"}],
+  imagem: '' // uri local do arquivo redimensionado
+}
+
 const App: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <CarrrinhoCompras_Screen />
+      <Produto_Screen produto={produto} />
       <StatusBar style="auto" />
     </SafeAreaView>
   );

@@ -8,11 +8,11 @@ import {
   Alert,
 } from "react-native";
 
-import { Produto } from "../CadastrarProduto/CadastrarProduto_Screen";
+import type { Produto } from "../CadastrarProduto/CadastrarProduto_Screen";
 
 
 // Página principal
-export default function Produto_Screen(produto: Produto) {
+export default function Produto_Screen({produto}: {produto: Produto}) {
 
   let estoque = 20
 
@@ -96,6 +96,12 @@ interface ProdutoInfoProps {
 }
 
 const ProdutoInfo_Component: React.FC<ProdutoInfoProps> = ({ produto }) => {
+
+  const termos = produto.termos_pesquisa.split("#")
+  .map(item => item.trim())
+  .filter(item => item.length > 0);
+  console.log(termos);
+  
   return (
     <View style={styles.produtoContainer}>
       <Image source={{ uri: produto.imagem }} style={styles.imgProduto} />
@@ -112,7 +118,7 @@ const ProdutoInfo_Component: React.FC<ProdutoInfoProps> = ({ produto }) => {
       <Text style={styles.preco}>R$ {produto.preco.toFixed(2)}</Text>
 
       <View style={styles.termosContainer}>
-        {produto.termos_pesquisa.map((t, index) => (
+        {termos.map((t: string, index: number) => (
           <Text key={index} style={styles.termo}>
             {t}
           </Text>
