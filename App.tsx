@@ -1,18 +1,13 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
+import 'react-native-reanimated';
+import { enableScreens } from 'react-native-screens';
+import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, StyleSheet } from 'react-native';
+import AppNavigator from './src/routes';
 
-import Header from './src/components/Header';
-import Home from './src/Screens/Home/Home_Screen';
-import AuthScreens from './src/Screens/Autenticacao/Autenticacao';
-import CadastrarProduto_Screen from './src/Screens/CadastrarProduto/CadastrarProduto_Screen';
-import HomeScreen from './src/Screens/Home/Home_Screen';
-import SobreNos_Screen from './src/Screens/SobreNos/SobreNos_Screen';
-import Produto_Screen from './src/Screens/Produto/Produto_Screen';
-import HistoricoPedidos_Screen from './src/Screens/HistoricoPedidos/HistoricoPedidos_Screen';
-import CarrrinhoCompras_Screen from './src/Screens/CarrinhoCompras/CarrinhoCompras';
+enableScreens();
 
-const produto = {
+/* const produto = {
   cod: 'string',
   nome: 'string',
   marca: 'string',
@@ -23,11 +18,11 @@ const produto = {
   categorias: [{id: '1', nome: "limpeza"}, {id: '2', nome: "casa"}],
   imagem: '' // uri local do arquivo redimensionado
 }
-
+ */
 const App: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
-      <Produto_Screen produto={produto} />
+      <AppNavigator />
       <StatusBar style="auto" />
     </SafeAreaView>
   );

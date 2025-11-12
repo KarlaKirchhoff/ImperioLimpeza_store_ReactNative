@@ -7,12 +7,21 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { useNavigation, useRoute } from '@react-navigation/native'
+import type { RouteProp } from '@react-navigation/native';
 
 import type { Produto } from "../CadastrarProduto/CadastrarProduto_Screen";
 
+type RootStackParamList = {
+  InfoProduto: { produto: Produto };
+};
+
+type InfoProdutoRouteProp = RouteProp<RootStackParamList, 'InfoProduto'>;
 
 // Página principal
-export default function Produto_Screen({produto}: {produto: Produto}) {
+export default function Produto_Screen() {
+  const route = useRoute<InfoProdutoRouteProp>();
+  const { produto } = route.params
 
   let estoque = 20
 
@@ -98,10 +107,9 @@ interface ProdutoInfoProps {
 const ProdutoInfo_Component: React.FC<ProdutoInfoProps> = ({ produto }) => {
 
   const termos = produto.termos_pesquisa.split("#")
-  .map(item => item.trim())
-  .filter(item => item.length > 0);
-  console.log(termos);
-  
+    .map(item => item.trim())
+    .filter(item => item.length > 0);
+
   return (
     <View style={styles.produtoContainer}>
       <Image source={{ uri: produto.imagem }} style={styles.imgProduto} />
