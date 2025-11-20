@@ -127,10 +127,10 @@ export default function CarrrinhoCompras_Screen({ userId, userName }: { userId?:
       );
 
       const orderFile = await gerarPedido.gerarPedido();
-      if (orderFile){
+      if (orderFile) {
         Alert.alert("Pedido Finalizado", "Arquivo disponível em: " + orderFile);
       }
-     
+
       // Após finalizar, opcionalmente limpar carrinho:
       await storage.apagarTodos();
       setItems([]);

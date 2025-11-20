@@ -11,17 +11,14 @@ import { useNavigation, useRoute } from '@react-navigation/native'
 import type { RouteProp } from '@react-navigation/native';
 
 import type { Produto } from "../CadastrarProduto/CadastrarProduto_Screen";
-
-type RootStackParamList = {
-  InfoProduto: { produto: Produto };
-};
+import type { RootStackParamList } from "../../routes";
 
 type InfoProdutoRouteProp = RouteProp<RootStackParamList, 'InfoProduto'>;
 
 // Página principal
 export default function Produto_Screen() {
   const route = useRoute<InfoProdutoRouteProp>();
-  const { produto } = route.params
+  const produto = route.params
 
   let estoque = 20
 

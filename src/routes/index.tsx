@@ -1,52 +1,43 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React from "react";
+
+import DrawerRoutes from "./DrawerRoutes";
+import AuthScreens from "../Screens/Autenticacao/Autenticacao"
+import Home from "../Screens/Home/Home_Screen";
+import InfoProduto from "../Screens/Produto/Produto_Screen";
+import type { Produto } from "../Screens/CadastrarProduto/CadastrarProduto_Screen";
+import { View } from "react-native";
+import { Text } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { NavigationContainer } from "@react-navigation/native";
 
-import Home_Screen from "../Screens/Home/Home_Screen";
-import Produto_Screen from "../Screens/Produto/Produto_Screen";
-import HistoricoPedidos_Screen from "../Screens/HistoricoPedidos/HistoricoPedidos_Screen";
+export type RootStackParamList = {
+  Login: undefined;
+  AppDrawer: undefined;
+  Home: undefined;
+  InfoProduto: Produto;
+};
 
-const Tab = createBottomTabNavigator();
+
 const Stack = createNativeStackNavigator();
-const Drawer = createDrawerNavigator();
 
-// nav inferior
-function TabRoutes() {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen name="HomeTab" component={HomeStack} options={{ headerShown: false, title:'Home' }}/>
-    </Tab.Navigator>
-  );
-}
+console.log(createNativeStackNavigator);
+console.log(NavigationContainer);
+console.log(AuthScreens);
+console.log(Home);
+console.log(InfoProduto);
+console.log(Stack);
 
-// pilha - Home
-function HomeStack() {
-  return (
-    <Stack.Navigator initialRouteName="Home">
-      <Stack.Screen name="Home" component={Home_Screen} options={{ headerShown: false }} />
-      <Stack.Screen name="InfoProduto" component={Produto_Screen} options={{ headerShown: false }} />
-    </Stack.Navigator>
-  )
-}
-
-// lateral
-function DrawerNavigator() {
-  return (
-    <Drawer.Navigator>
-      <Drawer.Screen name="Principal" component={TabRoutes} options={{ title: 'Início' }}/>
-      <Drawer.Screen name="Historico" component={HistoricoPedidos_Screen}  />
-    </Drawer.Navigator>
-  );
-}
-
-// App principal com Stack
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <TabRoutes />
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Login"
+          component={() => (
+            <View><Text>Teste OK</Text></View>
+          )}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-

@@ -12,27 +12,25 @@ import {
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { Ionicons } from "@expo/vector-icons";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 import ProdutoStorage from "../../storage/ProdutoStorage"; const storage = new ProdutoStorage();
 import { Produto } from "../CadastrarProduto/CadastrarProduto_Screen";
 import CarrinhoStorage from "../../storage/CarrinhoStorage"; const carrinhoStorage = new CarrinhoStorage();
 
 import type { CartItemType } from "../CarrinhoCompras/CarrinhoCompras";
-
-
-type RootStackParamList = {
-  Home: undefined;
-  InfoProduto: { produto: Produto };
-};
+import type { RootStackParamList } from "../../routes";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
+type Props = {
+  navigation: NavigationProp;
+};
 
 interface RenderItemProps {
   item: Produto;
 }
 
-export default function Home_Screen() {
+export default function Home_Screen({ navigation }: Props) {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [favoritos, setFavoritos] = useState<string[]>([]);
 
@@ -91,7 +89,6 @@ export default function Home_Screen() {
   };
 
   const renderItem = ({ item }: RenderItemProps) => {
-    const navigation = useNavigation<NavigationProp>();
     const isFavorito = favoritos.includes(item.cod);
 
     return (
@@ -103,7 +100,7 @@ export default function Home_Screen() {
         <View style={styles.buttonContainer}>
           <TouchableOpacity
             style={[styles.button, styles.viewButton]}
-            onPress={() => navigation.navigate("InfoProduto", { produto: item })}
+            onPress={() => navigation.navigate("InfoProduto", item)}
           >
             <Ionicons name="eye" size={20} color="#fff" />
           </TouchableOpacity>

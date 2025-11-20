@@ -4,6 +4,10 @@ import { enableScreens } from 'react-native-screens';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import AppNavigator from './src/routes';
+import Home_Screen from './src/Screens/Home/Home_Screen';
+import HistoricoPedidos_Screen from './src/Screens/HistoricoPedidos/HistoricoPedidos_Screen';
+import AuthScreens from './src/Screens/Autenticacao/Autenticacao';
+import Produto_Screen from './src/Screens/Produto/Produto_Screen';
 
 enableScreens();
 
@@ -19,7 +23,7 @@ enableScreens();
   imagem: '' // uri local do arquivo redimensionado
 }
  */
-const App: React.FC = () => {
+export default function App(){
   return (
     <SafeAreaView style={styles.container}>
       <AppNavigator />
@@ -35,4 +39,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
