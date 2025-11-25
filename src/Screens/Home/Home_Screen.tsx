@@ -15,7 +15,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 import ProdutoStorage from "../../storage/ProdutoStorage"; const storage = new ProdutoStorage();
-import { Produto } from "../CadastrarProduto/CadastrarProduto_Screen";
+import type { Produto } from "../../types/interface";
 import CarrinhoStorage from "../../storage/CarrinhoStorage"; const carrinhoStorage = new CarrinhoStorage();
 
 import type { CartItemType } from "../CarrinhoCompras/CarrinhoCompras";
@@ -49,14 +49,8 @@ export default function Home_Screen({ navigation }: Props) {
   }, []);
 
   const handleAddCarrinho = async (produto: Produto) => {
-    console.log('produto');
-    console.log(produto);
-
     try {
       const carrinhoAtual = await carrinhoStorage.listar();
-      console.log('carrinhoAtual');
-      console.log(carrinhoAtual);
-
       const itens: CartItemType[] = carrinhoAtual.map((i: any) =>
         i.product ? i : { product: i, quantity: 1 }
       );

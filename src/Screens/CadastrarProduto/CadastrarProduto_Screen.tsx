@@ -18,28 +18,16 @@ import gerarId from "../../utils/gerarId";
 import FormatarPrecoParaNumero from "../../utils/Formatacao/FormatarPrecoParaNumero";
 import DigitosPrecoParaNumero from "../../utils/Conversao/DigitosPrecoParaNumero";
 import ProdutoStorage from "../../storage/ProdutoStorage"; const storage = new ProdutoStorage();
-/* ------------------- Configs ------------------- */
 
+/* ------------------- Tipos ------------------- */
+import type { Produto } from "../../types/interface";
+
+/* ------------------- Configs ------------------- */
 const IMAGE_MAX_MB = 5; // limite em MB (ajuste conforme desejar)
 const ALLOWED_IMAGE_EXT = ["png", "jpg", "jpeg"];
 const MAX_IMG_WIDTH = 1024; // largura alvo para redimensionamento
 const IMAGE_QUALITY = 0.85; // 0..1
 export const PRODUCT_DIRECTORY = `${FileSystem.documentDirectory}produtos/`;
-
-/* ------------------- Tipos ------------------- */
-export type Categoria = { id: string; nome: string } // placeholder
-
-export interface Produto {
-    cod: string;
-    nome: string;
-    marca: string;
-    preco: number;
-    termos_pesquisa: string; // exemplo: "#limpeza_azul#multiuso"
-    descricao?: string;
-    dt_criacao: string; // ISO string
-    categorias: Categoria[];
-    imagem?: string; // uri local do arquivo redimensionado
-}
 
 /* ---------- util Unicode-aware length ---------- */
 const unicodeLen = (s: string) => Array.from(s).length;

@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { Produto } from "../Screens/CadastrarProduto/CadastrarProduto_Screen";
+import type { Produto } from "../types/interface";
 
 export default class ProdutoStorage {
     private PRODUCTS_STORAGE_KEY = "products_v1";
