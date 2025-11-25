@@ -12,6 +12,11 @@ import {
     ScrollView,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../routes";
+import { useNavigation } from "@react-navigation/native";
+
+type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 /**
  * Simples gerador de UUID4 (sem dependências).
@@ -94,12 +99,15 @@ const removeUserSecurely = async () => {
 
 /* ---------- Component principal com fluxo simples ---------- */
 export default function AuthScreens() {
-    const [screen, setScreen] = useState < "login" | "signup" | "home" > ("login");
-    const [loadingUser, setLoadingUser] = useState(true);
-    const [currentUser, setCurrentUser] = useState < { id_usuario: string; nome: string } | null > (
-        null
-    );
+    const navigation = useNavigation<NavProp>();
 
+    const [screen, setScreen] =
+        useState<"login" | "signup" | "home">("login");
+    const [loadingUser, setLoadingUser] = useState(true);
+    const [currentUser, setCurrentUser] =
+        useState<{ id_usuario: string; nome: string } | null>(null);
+
+    // Verificar usuário logado
     useEffect(() => {
         (async () => {
             const u = await getUserSecurely();
@@ -110,6 +118,16 @@ export default function AuthScreens() {
             setLoadingUser(false);
         })();
     }, []);
+
+    // 🟢 NAVEGAÇÃO PARA HOME
+    useEffect(() => {
+        if (screen === "home" && currentUser) {
+            navigation.reset({
+                index: 0,
+                routes: [{ name: "Home" }],
+            });
+        }
+    }, [screen, currentUser, navigation]);
 
     if (loadingUser) {
         return (
@@ -126,6 +144,7 @@ export default function AuthScreens() {
         >
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                 <View style={styles.container}>
+
                     {screen === "login" && (
                         <LoginScreen
                             onGoToSignUp={() => setScreen("signup")}
@@ -135,6 +154,7 @@ export default function AuthScreens() {
                             }}
                         />
                     )}
+
                     {screen === "signup" && (
                         <SignUpScreen
                             onGoToLogin={() => setScreen("login")}
@@ -144,21 +164,13 @@ export default function AuthScreens() {
                             }}
                         />
                     )}
-                    {screen === "home" && currentUser && (
-                        <HomeScreen
-                            user={currentUser}
-                            onLogout={async () => {
-                                await removeUserSecurely();
-                                setCurrentUser(null);
-                                setScreen("login");
-                            }}
-                        />
-                    )}
+
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
     );
 }
+
 
 /* ---------- Login Screen ---------- */
 function LoginScreen({
