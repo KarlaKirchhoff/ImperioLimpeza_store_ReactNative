@@ -1,6 +1,8 @@
-import React from 'react';
 import 'react-native-reanimated';
 import { enableScreens } from 'react-native-screens';
+enableScreens();
+import React from 'react';
+
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView, StyleSheet } from 'react-native';
 import AppNavigator from './src/routes';
@@ -8,8 +10,6 @@ import Home_Screen from './src/Screens/Home/Home_Screen';
 import HistoricoPedidos_Screen from './src/Screens/HistoricoPedidos/HistoricoPedidos_Screen';
 import AuthScreens from './src/Screens/Autenticacao/Autenticacao';
 import Produto_Screen from './src/Screens/Produto/Produto_Screen';
-
-enableScreens();
 
 /* const produto = {
   cod: 'string',
