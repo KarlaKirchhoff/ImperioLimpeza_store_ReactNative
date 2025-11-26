@@ -1,6 +1,7 @@
-import React from "react";
-import { createDrawerNavigator } from "@react-navigation/drawer";
+import React, { useEffect, useState } from "react";
+import { createDrawerNavigator, DrawerNavigationProp } from "@react-navigation/drawer";
 import TabRoutes, { TabsParamList } from "./TabRoutes";
+import { getFocusedRouteNameFromRoute, useNavigation, useRoute } from "@react-navigation/native";
 
 export type DrawerParamList = {
   Home_Tab: { initialTab?: keyof TabsParamList }
@@ -38,7 +39,7 @@ export default function DrawerRoutes() {
       <Drawer.Screen
         name="HistoricoPedidos_Tab"
         component={TabRoutes}
-        options={{ title: "Historico de Pedidos" }}
+        options={{ title: "Histórico de Pedidos" }}
         initialParams={{ initialTab: "HistoricoPedidos" }}
       />
       <Drawer.Screen

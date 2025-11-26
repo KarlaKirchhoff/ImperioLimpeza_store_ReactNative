@@ -21,6 +21,27 @@ type TabsRoutesProps = {
   route: RouteProp<DrawerParamList, keyof DrawerParamList>;
 };
 
+function changedInitalTab(name: string): string {
+  switch (name) {
+    case 'Home':
+      return name;
+
+    case 'SobreNos':
+      return 'Sobre Nós';
+
+    case 'CadastrarProduto':
+      return 'Cadastrar Produto';
+
+    case 'HistoricoPedidos':
+      return 'Histórico de Pedidos';
+  
+    case 'CarrinhoCompras':
+      return 'Carrinho de Compras';
+  
+    default:
+      return 'Imperio da Limpeza';
+  }
+}
 
 const Tab = createBottomTabNavigator<TabsParamList>();
 
@@ -38,11 +59,11 @@ export default function TabsRoutes({ route }: TabsRoutesProps) {
 
   useEffect(() => {
     const focused = getFocusedRouteNameFromRoute(route) as keyof TabsParamList | undefined;
+    console.log(focused);
 
-    const title = focused ? titles[focused] : "Início"; // fallback
-
+    const headerTitle = focused ? titles[focused] : changedInitalTab(initialTab); // fallback
     navigation.setOptions({
-      title,
+      headerTitle,
     });
   }, [route, navigation]);
 
