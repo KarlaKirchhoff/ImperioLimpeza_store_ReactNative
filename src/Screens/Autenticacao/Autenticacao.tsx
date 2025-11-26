@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../routes";
+import type { RootStackParamList } from "../../routes";
 import { useNavigation } from "@react-navigation/native";
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
@@ -124,7 +124,7 @@ export default function AuthScreens() {
         if (screen === "home" && currentUser) {
             navigation.reset({
                 index: 0,
-                routes: [{ name: "Home" }],
+                routes: [{ name: "AppDrawer" }],
             });
         }
     }, [screen, currentUser, navigation]);

@@ -1,32 +1,51 @@
 import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import TabsRoutes from "./TabRoutes";
-
-import Home from "../Screens/Home/Home_Screen";
-import InfoProduto from "../Screens/Produto/Produto_Screen";
-import SobreNos from "../Screens/SobreNos/SobreNos_Screen";
-import HistoricoPedidos from "../Screens/HistoricoPedidos/HistoricoPedidos_Screen";
-import CarrrinhoCompras from "../Screens/CarrinhoCompras/CarrinhoCompras";
-import CadastrarProduto from "../Screens/CadastrarProduto/CadastrarProduto_Screen";
+import TabRoutes, { TabsParamList } from "./TabRoutes";
 
 export type DrawerParamList = {
-  TabsRoutes: undefined;
-  CadastrarProduto_Drawer: undefined;
+  Home_Tab: { initialTab?: keyof TabsParamList }
+  SobreNos_Tab: { initialTab?: keyof TabsParamList };
+  CadastrarProduto_Tab: { initialTab?: keyof TabsParamList };
+  HistoricoPedidos_Tab: { initialTab?: keyof TabsParamList };
+  CarrinhoCompras_Tab: { initialTab?: keyof TabsParamList };
 };
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
 export default function DrawerRoutes() {
   return (
-    <Drawer.Navigator initialRouteName="TabsRoutes">
-      <Drawer.Screen 
-        name="CadastrarProduto_Drawer" 
-        component={CadastrarProduto} 
+    <Drawer.Navigator initialRouteName="Home_Tab">
+      {/* Home abre o TabNavigator */}
+      <Drawer.Screen
+        name="Home_Tab"
+        component={TabRoutes}
+        options={{ title: "Início" }}
+        initialParams={{ initialTab: "Home" }}
       />
-      <Drawer.Screen 
-        name="TabsRoutes" 
-        component={TabsRoutes} 
-        options={{ title: "Início" }} 
+      {/* SobreNos também abre o TabNavigator, mas com outra aba inicial */}
+      <Drawer.Screen
+        name="SobreNos_Tab"
+        component={TabRoutes}
+        options={{ title: "Sobre Nós" }}
+        initialParams={{ initialTab: "SobreNos" }}
+      />
+      <Drawer.Screen
+        name="CadastrarProduto_Tab"
+        component={TabRoutes}
+        options={{ title: "Cadastrar Produto" }}
+        initialParams={{ initialTab: "CadastrarProduto" }}
+      />
+      <Drawer.Screen
+        name="HistoricoPedidos_Tab"
+        component={TabRoutes}
+        options={{ title: "Historico de Pedidos" }}
+        initialParams={{ initialTab: "HistoricoPedidos" }}
+      />
+      <Drawer.Screen
+        name="CarrinhoCompras_Tab"
+        component={TabRoutes}
+        options={{ title: "Carrinho de Compras" }}
+        initialParams={{ initialTab: "CarrinhoCompras" }}
       />
     </Drawer.Navigator>
   );
