@@ -323,6 +323,7 @@ export default function CadastrarProduto_Screen() {
                 marca: marca.trim(),
                 preco: precoNum,
                 termos_pesquisa: termosHashTags,
+                favorito: false,
                 descricao: descricao.trim(),
                 dt_criacao: new Date().toISOString(),
                 categorias: [],

@@ -6,6 +6,7 @@ export interface Produto {
     marca: string;
     preco: number;
     termos_pesquisa: string; // exemplo: "#limpeza_azul#multiuso"
+    favorito: boolean;
     descricao?: string;
     dt_criacao: string; // ISO string
     categorias: Categoria[];

@@ -10,8 +10,9 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native'
 import type { RouteProp } from '@react-navigation/native';
 
-import type { Produto } from "../CadastrarProduto/CadastrarProduto_Screen";
+import type { Produto } from "../../types/interface";
 import type { RootStackParamList } from "../../routes";
+import ProdutoStorage from "../../storage/ProdutoStorage"; const storage = new ProdutoStorage() 
 
 type InfoProdutoRouteProp = RouteProp<RootStackParamList, 'InfoProduto'>;
 
@@ -37,10 +38,15 @@ export default function Produto_Screen() {
     if (quantidade > 1) setQuantidade(quantidade - 1);
   };
 
-  const handleAddFavorito = () => {
-    setFavorito(!favorito);
+  const handleAddFavorito = (item: Produto) => {
+    const update: Produto = {
+      ...item,
+      favorito: !item.favorito
+    } 
+    await storage.atualizarItem(update)
+    setFavorito(update.favorito);
     Alert.alert(
-      favorito ? "Removido dos Favoritos" : "Adicionado aos Favoritos"
+      produto.favorito ? "Removido dos Favoritos" : "Adicionado aos Favoritos"
     );
   };
 
@@ -81,10 +87,10 @@ export default function Produto_Screen() {
       <View style={styles.btnsContainer}>
         <TouchableOpacity
           style={[styles.btnFavorito, favorito && styles.btnFavoritoAtivo]}
-          onPress={handleAddFavorito}
+          onPress={() => handleAddFavorito(produto)}
         >
           <Text style={styles.textBtnAcao}>
-            {favorito ? "❤️ Favoritado" : "🤍 Add Favoritos"}
+            {produto.favorito ? "❤️ Favoritado" : "🤍 Add Favoritos"}
           </Text>
         </TouchableOpacity>
 
