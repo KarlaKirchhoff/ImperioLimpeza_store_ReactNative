@@ -34,10 +34,10 @@ function changedInitalTab(name: string): string {
 
     case 'HistoricoPedidos':
       return 'Histórico de Pedidos';
-  
+
     case 'CarrinhoCompras':
       return 'Carrinho de Compras';
-  
+
     default:
       return 'Imperio da Limpeza';
   }
@@ -59,7 +59,6 @@ export default function TabsRoutes({ route }: TabsRoutesProps) {
 
   useEffect(() => {
     const focused = getFocusedRouteNameFromRoute(route) as keyof TabsParamList | undefined;
-    console.log(focused);
 
     const headerTitle = focused ? titles[focused] : changedInitalTab(initialTab); // fallback
     navigation.setOptions({
@@ -67,7 +66,7 @@ export default function TabsRoutes({ route }: TabsRoutesProps) {
     });
   }, [route, navigation]);
 
-
+  console.log(initialTab);
   return (
     <Tab.Navigator initialRouteName={initialTab} screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Home" component={Home} options={{ title: "Início" }} />

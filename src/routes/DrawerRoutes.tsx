@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createDrawerNavigator, DrawerNavigationProp } from "@react-navigation/drawer";
 import TabRoutes, { TabsParamList } from "./TabRoutes";
-import { getFocusedRouteNameFromRoute, useNavigation, useRoute } from "@react-navigation/native";
 
 export type DrawerParamList = {
   Home_Tab: { initialTab?: keyof TabsParamList }
