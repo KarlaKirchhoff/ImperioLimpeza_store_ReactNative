@@ -52,7 +52,7 @@ export default class CarrinhoStorage {
             if (!raw) return false;
 
             const arr: CartItemType[] = JSON.parse(raw);
-            const atualizado = arr.filter((p) => p.cod !== cod);
+            const atualizado = arr.filter((p) => p.product.cod !== cod);
 
             await this.atualzarLista(atualizado);
             return true;
@@ -68,7 +68,7 @@ export default class CarrinhoStorage {
             if (!raw) return false;
 
             const arr: CartItemType[] = JSON.parse(raw);
-            const index = arr.findIndex((p) => p.cod === produtoAtualizado.cod);
+            const index = arr.findIndex((p) => p.product.cod === produtoAtualizado.product.cod);
 
             if (index === -1) return false; // não encontrado
 

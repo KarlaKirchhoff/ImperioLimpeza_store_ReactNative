@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import type { RouteProp } from '@react-navigation/native';
 
 import type { Produto } from "../../types/interface";
 import type { RootStackParamList } from "../../routes";
-import ProdutoStorage from "../../storage/ProdutoStorage"; const storage = new ProdutoStorage() 
+import ProdutoStorage from "../../storage/ProdutoStorage"; const storage = new ProdutoStorage()
 
 type InfoProdutoRouteProp = RouteProp<RootStackParamList, 'InfoProduto'>;
 
@@ -24,9 +24,21 @@ export default function Produto_Screen() {
   let estoque = 20
 
   const [quantidade, setQuantidade] = useState(1);
-  const [favorito, setFavorito] = useState(false);
+  const [favorito, setFavorito] = useState(produto.favorito);
 
   const precoTotal = (produto.preco * quantidade).toFixed(2);
+
+  useEffect(() => {
+    const carregarProdutoStorage = async () => {
+      const produto_storage = await storage.produtoCod(produto.cod);
+
+      if (produto_storage && typeof produto_storage === "object") {
+        setFavorito(produto_storage.favorito);
+      }
+    };
+    carregarProdutoStorage();
+  }, []);
+
 
   // importar a quantidade do estoque via API
   const aumentarQtd = () => {
@@ -38,16 +50,24 @@ export default function Produto_Screen() {
     if (quantidade > 1) setQuantidade(quantidade - 1);
   };
 
-  const handleAddFavorito = (item: Produto) => {
-    const update: Produto = {
-      ...item,
-      favorito: !item.favorito
-    } 
-    await storage.atualizarItem(update)
-    setFavorito(update.favorito);
-    Alert.alert(
-      produto.favorito ? "Removido dos Favoritos" : "Adicionado aos Favoritos"
-    );
+  const handleAddFavorito = async (item: Produto) => {
+    try {
+      const novoFavorito = !favorito;
+      const atualizado: Produto = {
+        ...item,
+        favorito: novoFavorito
+      };
+
+      await storage.atualizarItem(atualizado);
+      setFavorito(novoFavorito);
+
+      Alert.alert(
+        novoFavorito ? "Adicionado aos Favoritos" : "Removido dos Favoritos"
+      );
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível atualizar o favorito.");
+      console.error("Erro ao favoritar:", error);
+    }
   };
 
   const handleAddCarrinho = () => {
@@ -90,7 +110,7 @@ export default function Produto_Screen() {
           onPress={() => handleAddFavorito(produto)}
         >
           <Text style={styles.textBtnAcao}>
-            {produto.favorito ? "❤️ Favoritado" : "🤍 Add Favoritos"}
+            {favorito ? "❤️ Favoritado" : "🤍 Add Favoritos"}
           </Text>
         </TouchableOpacity>
 

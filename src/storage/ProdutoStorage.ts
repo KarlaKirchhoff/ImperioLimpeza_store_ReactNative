@@ -36,6 +36,20 @@ export default class ProdutoStorage {
         }
     }
 
+    produtoCod = async (cod: string): Promise<Produto | false> => {
+        try {
+            const raw = await AsyncStorage.getItem(this.PRODUCTS_STORAGE_KEY);
+            if (!raw) return false;
+
+            const arr: Produto[] = JSON.parse(raw);
+            const produto = arr.find((p) => p.cod === cod);
+            return produto || false;
+        } catch (err) {
+            console.error("deleteProductById", err);
+            return false;
+        }
+    };
+
     apagarTodos = async (): Promise<boolean> => {
         try {
             await AsyncStorage.removeItem(this.PRODUCTS_STORAGE_KEY);
@@ -62,7 +76,7 @@ export default class ProdutoStorage {
         }
     };
 
-    atualizarItem = async (produtoAtualizado: Produto): Promise<boolean> => {
+    atualizarItem = async (produtoAtualizado: Produto): Promise<Produto | false> => {
         try {
             const raw = await AsyncStorage.getItem(this.PRODUCTS_STORAGE_KEY);
             if (!raw) return false;
@@ -74,7 +88,7 @@ export default class ProdutoStorage {
 
             arr[index] = produtoAtualizado; // substitui
             await this.atualzarLista(arr);
-            return true;
+            return arr[index];
         } catch (err) {
             console.error("updateProduct", err);
             return false;
